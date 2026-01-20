@@ -387,37 +387,86 @@
                     <h2 class="font-serif text-4xl mb-2 text-saffronDark">Book a Table</h2>
                     <p class="text-gray-600 mb-8 font-sans text-sm">Join us at Navshya Ganapati Parisar</p>
                     
-                    <form class="space-y-6" onsubmit="event.preventDefault(); alert('Table request sent! We will confirm shortly.');">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="relative">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Date</label>
-                                <input type="date" class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg">
-                            </div>
-                            <div class="relative">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Time</label>
-                                <input type="time" class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="relative">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Guests</label>
-                                <select class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg">
-                                    <option>2 People</option>
-                                    <option>4 People</option>
-                                    <option>6+ People</option>
-                                </select>
-                            </div>
-                            <div class="relative">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Phone</label>
-                                <input type="tel" placeholder="+91" class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg">
-                            </div>
-                        </div>
+                    <form id="bookingForm" class="space-y-6">
 
-                        <button type="submit" class="w-full bg-richBlack text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-saffron transition-colors duration-300 mt-4">
-                            Confirm Reservation
-                        </button>
-                    </form>
+  <!-- Date & Time -->
+  <div class="grid grid-cols-2 gap-6">
+    <div class="relative">
+      <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">
+        Date
+      </label>
+      <input
+        type="date"
+        id="date"
+        required
+        class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg"
+      >
+    </div>
+
+    <div class="relative">
+      <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">
+        Time
+      </label>
+      <select
+  id="time"
+  required
+  class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg"
+>
+  <option value="">Select Time</option>
+  <option value="11:00 AM">11:00 AM</option>
+  <option value="12:00 PM">12:00 PM</option>
+  <option value="01:00 PM">01:00 PM</option>
+  <option value="02:00 PM">02:00 PM</option>
+  <option value="06:00 PM">06:00 PM</option>
+  <option value="07:00 PM">07:00 PM</option>
+  <option value="08:00 PM">08:00 PM</option>
+  <option value="09:00 PM">09:00 PM</option>
+</select>
+
+    </div>
+  </div>
+
+  <!-- Guests & Phone -->
+  <div class="grid grid-cols-2 gap-6">
+    <div class="relative">
+      <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">
+        Guests
+      </label>
+      <select
+        id="guests"
+        required
+        class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg"
+      >
+        <option value="2 People">2 People</option>
+        <option value="4 People">4 People</option>
+        <option value="6+ People">6+ People</option>
+      </select>
+    </div>
+
+    <div class="relative">
+      <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">
+        Phone
+      </label>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="+91"
+        required
+        class="w-full bg-transparent border-b-2 border-gray-300 focus:border-saffron py-2 outline-none transition-colors font-serif text-lg"
+      >
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <button
+    type="submit"
+    class="w-full bg-richBlack text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-saffron transition-colors duration-300 mt-4"
+  >
+    Confirm Reservation
+  </button>
+
+</form>
+
                 </div>
 
             </div>
@@ -518,8 +567,98 @@
         </div>
     </footer>
 
-    <!-- Animations Script -->
-    <script>
+    <script type="module">
+  // Firebase core
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+
+  // Firestore
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY7Vg8BXhuSg-MzqqS43SOeqj8d6DUVZA",
+    authDomain: "siddhivinayak-bookings.firebaseapp.com",
+    projectId: "siddhivinayak-bookings",
+    storageBucket: "siddhivinayak-bookings.firebasestorage.app",
+    messagingSenderId: "709686495965",
+    appId: "1:709686495965:web:efa4421ccf1cc0bba82934"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Initialize Firestore
+  const db = getFirestore(app);
+
+  // Booking form logic
+  const form = document.getElementById("bookingForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+      await addDoc(collection(db, "bookings"), {
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value,
+        guests: document.getElementById("guests").value,
+        phone: document.getElementById("phone").value,
+        status: "Pending",
+        createdAt: serverTimestamp()
+      });
+
+      showPopup();
+
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Booking failed");
+    }
+  });
+
+import {
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const dateInput = document.getElementById("date");
+const timeSelect = document.getElementById("time");
+
+dateInput.addEventListener("change", async () => {
+  const selectedDate = dateInput.value;
+
+  // Reset all options
+  Array.from(timeSelect.options).forEach(opt => {
+  opt.disabled = false;
+  opt.textContent = opt.value || "Select Time";
+});
+
+
+  const q = query(
+    collection(db, "bookings"),
+    where("date", "==", selectedDate)
+  );
+
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(doc => {
+    const bookedTime = doc.data().time;
+
+    Array.from(timeSelect.options).forEach(opt => {
+      if (opt.value === bookedTime) {
+        opt.disabled = true;
+        opt.textContent = `${opt.value} (Booked)`;
+      }
+    });
+  });
+});
+
+
+
         // Register GSAP Plugins
         gsap.registerPlugin(ScrollTrigger);
 
@@ -731,6 +870,54 @@
             repeat: -1
         });
 
-    </script>
+
+        window.showPopup = () => {
+  const popup = document.getElementById("successPopup");
+  const box = popup.querySelector("div");
+
+  popup.classList.remove("hidden");
+  popup.classList.add("flex");
+
+  gsap.to(box, {
+    scale: 1,
+    opacity: 1,
+    duration: 0.6,
+    ease: "elastic.out(1, 0.5)"
+  });
+};
+
+window.closePopup = () => {
+  const popup = document.getElementById("successPopup");
+  popup.classList.add("hidden");
+};
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  console.log("Form submit triggered");
+
+
+
+</script>
+
+<div
+  id="successPopup"
+  class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[9999]"
+>
+  <div class="bg-offWhite text-richBlack rounded-2xl p-10 text-center max-w-sm scale-75 opacity-0">
+    <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+    <h3 class="font-serif text-2xl mb-2">Booking Requested!</h3>
+    <p class="text-gray-600 mb-6">
+      We will confirm your table shortly.
+    </p>
+    <button
+      onclick="closePopup()"
+      class="px-6 py-2 bg-saffron text-white rounded-full font-bold"
+    >
+      OK
+    </button>
+  </div>
+</div>
+
+
 </body>
 </html>
